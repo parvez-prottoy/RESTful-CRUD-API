@@ -62,6 +62,29 @@ app.post("/", (req: Request, res: Response) => {
   });
 });
 
+app.post("/users", async (req: Request, res: Response) => {
+  const { name, email, age, phone, address } = req.body;
+  // insert user into the database
+  try {
+    const result = await pool.query(
+      "INSERT INTO users (name, email, age, phone, address) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [name, email, age, phone, address],
+    );
+    console.log(result.rows[0]);
+    res.status(201).send({
+      success: true,
+      message: "User created successfully",
+      data: result.rows[0],
+    });
+  } catch (error: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error creating user",
+      error: error.message,
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
