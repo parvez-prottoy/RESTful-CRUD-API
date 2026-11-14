@@ -62,6 +62,7 @@ app.post("/", (req: Request, res: Response) => {
   });
 });
 
+// Create a new user
 app.post("/users", async (req: Request, res: Response) => {
   const { name, email, age, phone, address } = req.body;
   // insert user into the database
@@ -76,11 +77,28 @@ app.post("/users", async (req: Request, res: Response) => {
       message: "User created successfully",
       data: result.rows[0],
     });
-  } catch (error: any) {
+  } catch (err: any) {
     res.status(500).send({
       success: false,
       message: "Error creating user",
-      error: error.message,
+      error: err.message,
+    });
+  }
+});
+// Get all users
+app.get("/users", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query("SELECT * FROM users");
+    res.status(200).send({
+      success: true,
+      message: "Users retrieved successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error retrieving users",
+      error: err.message,
     });
   }
 });
