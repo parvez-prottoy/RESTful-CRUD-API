@@ -1,5 +1,5 @@
 import express, { type Express, type Request, type Response } from "express";
-import { Pool } from "pg";
+import { Pool, Result } from "pg";
 import dotenv from "dotenv";
 import path from "path";
 
@@ -98,6 +98,32 @@ app.get("/users", async (req: Request, res: Response) => {
     res.status(500).send({
       success: false,
       message: "Error retrieving users",
+      error: err.message,
+    });
+  }
+});
+
+// Get a user by ID
+app.get("/users/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    if (result.rows.length === 0) {
+      res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        message: "User retrieved successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error retrieving user",
       error: err.message,
     });
   }
