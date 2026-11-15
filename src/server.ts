@@ -55,7 +55,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.post("/", (req: Request, res: Response) => {
-  console.log(req.body);
   res.status(201).send({
     message: "Data received successfully",
     data: req.body,
@@ -71,7 +70,6 @@ app.post("/users", async (req: Request, res: Response) => {
       "INSERT INTO users (name, email, age, phone, address) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [name, email, age, phone, address],
     );
-    console.log(result.rows[0]);
     res.status(201).send({
       success: true,
       message: "User created successfully",
@@ -124,6 +122,36 @@ app.get("/users/:id", async (req: Request, res: Response) => {
     res.status(500).send({
       success: false,
       message: "Error retrieving user",
+      error: err.message,
+    });
+  }
+});
+
+// Update a user by ID
+app.patch("/users/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, email, age, phone, address } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE users SET name = $1, email = $2, age = $3, phone = $4, address = $5, updated_at = NOW() WHERE id = $6 RETURNING *",
+      [name, email, age, phone, address, id],
+    );
+    if (result.rows.length === 0) {
+      res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        message: "User updated successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error updating user",
       error: err.message,
     });
   }
