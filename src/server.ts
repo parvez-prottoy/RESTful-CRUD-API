@@ -61,6 +61,7 @@ app.post("/", (req: Request, res: Response) => {
   });
 });
 
+// ? Users CRUD operations
 // Create a new user
 app.post("/users", async (req: Request, res: Response) => {
   const { name, email, age, phone, address } = req.body;
@@ -180,6 +181,30 @@ app.delete("/users/:id", async (req: Request, res: Response) => {
     res.status(500).send({
       success: false,
       message: "Error deleting user",
+      error: err.message,
+    });
+  }
+});
+
+// ? Todos CRUD operations
+
+// Create a new todo
+app.post("/todos", async (req: Request, res: Response) => {
+  const { user_id, title, description } = req.body;
+  try {
+    const result = await pool.query(
+      "INSERT INTO todos (user_id, title, description) VALUES ($1,$2,$3) RETURNING *",
+      [user_id, title, description],
+    );
+    res.status(201).send({
+      success: true,
+      message: "Todo created successfully",
+      data: result.rows[0],
+    });
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error creating todo",
       error: err.message,
     });
   }
