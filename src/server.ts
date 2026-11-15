@@ -228,6 +228,27 @@ app.get("/todos", async (req: Request, res: Response) => {
   }
 });
 
+// Get a todo by user_id
+app.get("/todos/:user_id", async (req: Request, res: Response) => {
+  const { user_id } = req.params;
+  try {
+    const result = await pool.query("SELECT * FROM todos WHERE user_id = $1", [
+      user_id,
+    ]);
+    res.status(200).send({
+      success: true,
+      message: "Todos retrieved successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error retrieving todos",
+      error: err.message,
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
