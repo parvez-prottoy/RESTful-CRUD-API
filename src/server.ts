@@ -249,6 +249,67 @@ app.get("/todos/:user_id", async (req: Request, res: Response) => {
   }
 });
 
+// Update a todo by ID
+app.patch("/todos/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { user_id, title, description } = req.body;
+
+  try {
+    const result = await pool.query(
+      "UPDATE todos SET user_id = $1, title = $2, description = $3 WHERE id = $4 RETURNING *",
+      [user_id, title, description, id],
+    );
+    if (result.rows.length === 0) {
+      res.status(404).send({
+        success: false,
+        message: "Todo not found",
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        message: "Todo updated successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error updating todo",
+      error: err.message,
+    });
+  }
+});
+
+// Delete a todo by ID
+app.delete("/todos/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      "DELETE FROM todos WHERE id = $1 RETURNING *",
+      [id],
+    );
+    if (result.rows.length === 0) {
+      res.status(404).send({
+        success: false,
+        message: "Todo not found",
+      });
+    } else {
+      res.status(200).send({
+        success: true,
+        message: "Todo deleted successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error deleting todo",
+      error: err.message,
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
