@@ -210,6 +210,24 @@ app.post("/todos", async (req: Request, res: Response) => {
   }
 });
 
+// Get all todos
+app.get("/todos", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query("SELECT * FROM todos");
+    res.status(200).send({
+      success: true,
+      message: "Todos retrieved successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).send({
+      success: false,
+      message: "Error retrieving todos",
+      error: err.message,
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
