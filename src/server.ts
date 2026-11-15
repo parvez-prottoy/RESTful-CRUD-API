@@ -310,6 +310,14 @@ app.delete("/todos/:id", async (req: Request, res: Response) => {
   }
 });
 
+// Handle 404 for undefined routes
+app.use((req: Request, res: Response) => {
+  res.status(404).send({
+    success: false,
+    message: "Route not found",
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
