@@ -1,16 +1,12 @@
 import express, { type Express, type Request, type Response } from "express";
 import { Pool, Result } from "pg";
-import dotenv from "dotenv";
-import path from "path";
-
-dotenv.config({ path: path.join(process.cwd(), ".env") });
+import { dbConnectionString, port } from "./config";
 
 const app: Express = express();
-const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 8000;
 
 // DB
 const pool = new Pool({
-  connectionString: process.env.DB_CONNECTION_STRING,
+  connectionString: dbConnectionString,
 });
 
 const initDB = async () => {
@@ -318,6 +314,6 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
