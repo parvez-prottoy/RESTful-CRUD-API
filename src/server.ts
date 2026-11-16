@@ -17,13 +17,6 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World! This is a TypeScript Express server.");
 });
 
-app.post("/", (req: Request, res: Response) => {
-  res.status(201).send({
-    message: "Data received successfully",
-    data: req.body,
-  });
-});
-
 // ? users routes
 app.use("/users", userRoutes);
 // ? todos routes
